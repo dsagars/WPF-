@@ -20,46 +20,36 @@ using System.Collections.ObjectModel;
 
 namespace Test
 {
-
+    
     public partial class EnterData : Window
     {
         XmlSerializer xs;
-        List<Company> Companies;
-        List<Address> Addresses;
-        List<Car> CompanyCars;
+        private ObservableCollection<Company> Companies = new ObservableCollection<Company>();
+        
+      
         public EnterData()
         {
-
+            
             InitializeComponent();
-            xs = new XmlSerializer(typeof(List<Company>));
-            Companies = new List<Company>();
-
-            Addresses = new List<Address>();
-            Addresses.Add(new Test.Address { Street = "Frankenstr.", HouseNumber = 12, PostalCode = 20097, City = "Hamburg" });
-            Addresses.Add(new Test.Address { Street = "Abcstr.", HouseNumber = 12, PostalCode = 20097, City = "Hamburg" });
-
-
-            Car car1 = new Car() { Brand = "Audi", Model = "A8", Color = "Red", Doors = 2, Tires = 4, ManufactureDate = new DateTime(2016, 08, 12) };
-            Car car2 = new Car() { Brand = "BMW", Model = "coupe", Color = "Blue", Tires = 4, ManufactureDate = new DateTime(2016, 08, 12) };
-            Car car3 = new Car() { Brand = "Opel", Model = "Astra", Color = "Black", Doors = 2, Tires = 4, ManufactureDate = new DateTime(2016, 08, 12) };
-            Car car4 = new Car() { Brand = "Mercedes", Model = "Benz", Color = "Black", Doors = 4, Tires = 4, ManufactureDate = new DateTime(2016, 08, 12) };
-            CompanyCars = new List<Car>() { car1, car2, car3, car4 };
-
+            xs = new XmlSerializer(typeof(ObservableCollection<Company>));
+            Companies = new ObservableCollection<Company>();
+            DataContext = this;
             dataGrid2.DataContext = Companies;
-            dataGrid2.ItemsSource = CompanyCars;
+            
 
 
         }
 
-        public void Save_Click(object sender, RoutedEventArgs e)
+        private void Save_Click(object sender, RoutedEventArgs e)
         {
-
+            
             FileStream fs = new FileStream("C:\\CompanyDetails.xml", FileMode.Create, FileAccess.Write);
             Company company = new Company();
-            company.CompanyName = textbox1.Text;
-            company.IsMainCompany = bool.Parse(textbox2.Text);
-            textbox3.DataContext = company.Cars;
-            Companies.Add(company);
+            textbox1.Text = company.CompanyName;
+            textbox2.Text = Convert.ToString(company.IsMainCompany);
+            textbox3.Text = Convert.ToString(company.CompanyAddress);
+            textbox4.Text = Convert.ToString(company.Cars);
+            Companies.Add(company);    
             xs.Serialize(fs, Companies);
             fs.Close();
 
@@ -67,12 +57,11 @@ namespace Test
 
         private void Read_Click(object sender, RoutedEventArgs e)
         {
-
+           
             FileStream fs = new FileStream("C:\\CompanyDetails.xml", FileMode.Open, FileAccess.Read);
-            Companies = (List<Company>)xs.Deserialize(fs);
+            Companies = (ObservableCollection<Company>)xs.Deserialize(fs);
             dataGrid2.ItemsSource = Companies;
             fs.Close();
         }
-
     }
 }
